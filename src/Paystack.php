@@ -905,7 +905,7 @@ class Paystack
     {
         $data = [];
         $this->setRequestOptions();
-        return $this->setHttpResponse('/bank', 'POST', $data)->getResponse();
+        return $this->setHttpResponse('/bank', 'GET',[])->getResponse();
     }
     
 }
