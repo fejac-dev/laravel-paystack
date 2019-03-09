@@ -907,5 +907,19 @@ class Paystack
         $this->setRequestOptions();
         return $this->setHttpResponse('/bank', 'GET',[])->getResponse();
     }
-    
+    /**
+     * Resolve Account Number
+     * 
+     * @author Jacob Oluwafemi     
+     * @return array 
+     */
+    public function resolveAccountNumber()
+    {
+        $data = [
+            "account_number" => request()->account_number,
+            "bank_code" => request()->bank_code,
+        ];
+        $this->setRequestOptions();
+        return $this->setHttpResponse('/bank/resolve', 'GET',$data)->getResponse();
+    }
 }
