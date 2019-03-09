@@ -863,7 +863,7 @@ class Paystack
     {
         $data = [];
         $this->setRequestOptions();
-        return $this->setHttpResponse('/transfer/disable_otp ', 'POST', $data)->getResponse();
+        return $this->setHttpResponse('/transfer/disable_otp', 'POST', $data)->getResponse();
     }
 
     /**
@@ -879,7 +879,7 @@ class Paystack
             "otp" => request()->otp
         ];
         $this->setRequestOptions();
-        return $this->setHttpResponse('/transfer/disable_otp_finalize ', 'POST', $data)->getResponse();
+        return $this->setHttpResponse('/transfer/disable_otp_finalize', 'POST', $data)->getResponse();
     }
 
     /**
@@ -892,6 +892,20 @@ class Paystack
     {
         $data = [];
         $this->setRequestOptions();
-        return $this->setHttpResponse('/transfer/enable_otp ', 'POST', $data)->getResponse();
+        return $this->setHttpResponse('/transfer/enable_otp', 'POST', $data)->getResponse();
     }
+    
+    /**
+     * List of Banks
+     * 
+     * @author Jacob Oluwafemi     
+     * @return array 
+     */
+    public function listBank()
+    {
+        $data = [];
+        $this->setRequestOptions();
+        return $this->setHttpResponse('/bank', 'POST', $data)->getResponse();
+    }
+    
 }
