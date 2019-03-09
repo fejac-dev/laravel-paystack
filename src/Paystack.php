@@ -920,6 +920,6 @@ class Paystack
             "bank_code" => request()->bank_code,
         ];
         $this->setRequestOptions();
-        return $this->setHttpResponse('/bank/resolve', 'GET',$data)->getResponse();
+        return $this->setHttpResponse('/bank/resolve?' . http_build_query($data), 'GET',[])->getResponse();
     }
 }
