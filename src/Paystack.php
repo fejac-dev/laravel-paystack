@@ -660,5 +660,238 @@ class Paystack
         $this->setRequestOptions();
         return $this->setHttpResponse("/subaccount/{$subaccount_code}", "PUT", array_filter($data))->getResponse();
 
+    }    
+
+    /**
+     * Create a transfer recipient.
+     * @author Jacob Oluwafemi
+     * @param 
+     * @return array
+     */
+    public function createTransferRecipient(){
+        $data = [
+            "type" => request()->type,
+            "name"=> request()->name,
+            "description"=> request()->description,
+            "account_number"  => request()->account_number,
+            "bank_code"=> request()->bank_code,
+            "currency" => request()->currency,
+            "metadata" => request()->metadata
+        ];
+
+        $this->setRequestOptions();
+        return $this->setHttpResponse("/transferrecipient", "PUT", array_filter($data))->getResponse();
+    }
+
+    /**
+     * Lists all the transfer recipient
+     * @author Jacob Oluwafemi
+     * @param $per_page - Specifies how many records to retrieve per page , $page - Specifies exactly what page to retrieve
+     * @return array
+     */
+    public function listTransferRecipient($per_page,$page){
+        $this->setRequestOptions();
+        return $this->setHttpResponse("/transferrecipient/?perPage=".(int) $per_page."&page=".(int) $page,"GET")->getResponse();
+    }
+
+    /**
+     * Update an existing transfer recipients.
+     * @author Jacob Oluwafemi
+     * @param $recipient_code_or_id
+     * @return array
+     */
+    public function updateTransferRecipient($recipient_code_or_id)
+    {
+        $data = [
+            "email" => request()->email,            
+            "name" => request()->name,                
+        ];
+
+        $this->setRequestOptions();
+        return $this->setHttpResponse('/transferrecipient/'. $recipient_code_or_id, 'PUT', $data)->getResponse();
+    }
+
+    /**
+     * Delete an existing transfer recipient.
+     * @author Jacob Oluwafemi
+     * @param $recipient_code_or_id
+     * @return array 
+     */
+    public function deleteTransferRecipient($recipient_code_or_id)
+    {
+        $data = [
+            "email" => request()->email,            
+            "name" => request()->name,                
+        ];
+
+        $this->setRequestOptions();
+        return $this->setHttpResponse('/transferrecipient/'. $recipient_code_or_id, 'PUT', $data)->getResponse();
+    }
+
+    /**
+     * Fetch a transfer recipient based on id or code
+     * @param $recipient_code_or_id
+     * @return array
+     */
+    public function fetchTransferRecipient($recipient_code_or_id)
+    {
+        $this->setRequestOptions();
+        return $this->setHttpResponse('/transferrecipient/'. $recipient_code_or_id, 'GET', [])->getResponse();
+    }
+
+
+    /**
+     
+     * Initiate a transfer request to Paystack
+     * @author Jacob Oluwafemi
+     * @return array ["status": true,  "message": "Transfer requires OTP to continue",  "data": { "integration": 100073, "domain": "test", "amount": 3794800, "currency": "NGN", "source": "balance","reason": "Calm down", "recipient": 28, "status": "otp", "transfer_code": "TRF_1ptvuv321ahaa7q", "id": 14, "createdAt": "2017-02-03T17:21:54.508Z", "updatedAt": "2017-02-03T17:21:54.508Z" }]
+     */
+    public function initiateTransfer( $data = null)
+    {        
+        if ( $data == null ) {
+            $data = [
+                "source" => request()->source,             
+                "reason" => request()->reason,
+                "amount" => intval(request()->amount),
+                "currency" => request()->currency,
+                "recipient" => request()->recipient,    
+                "reference" => request()->reference,   
+                         
+            ];        
+            array_filter($data);
+        }
+
+       return $this->setHttpResponse('/transfer/initialize', 'POST', $data)->getResponse();        
+    }
+
+    /**
+     * Lists all the transfers
+     * @author Jacob Oluwafemi
+     * @param $per_page - Specifies how many records to retrieve per page , $page - Specifies exactly what page to retrieve
+     * @return array
+     */
+    public function listTransfers($per_page,$page){
+        $this->setRequestOptions();
+        return $this->setHttpResponse("/transfer/?perPage=".(int) $per_page."&page=".(int) $page,"GET")->getResponse();
+    }
+
+    /**
+     * Fetch a transfer based on id or code
+     * @param $id_or_code
+     * @return array
+     */
+    public function fetchTransfer($id_or_code)
+    {
+        $this->setRequestOptions();
+        return $this->setHttpResponse('/transfer/'. $id_or_code, 'GET', [])->getResponse();
+    }
+    
+    /**
+     
+     * Finalize a transfer request to Paystack
+     * @author Jacob Oluwafemi
+     * @return array ["status": true,  "message": "Transfer requires OTP to continue",  "data": { "integration": 100073, "domain": "test", "amount": 3794800, "currency": "NGN", "source": "balance","reason": "Calm down", "recipient": 28, "status": "otp", "transfer_code": "TRF_1ptvuv321ahaa7q", "id": 14, "createdAt": "2017-02-03T17:21:54.508Z", "updatedAt": "2017-02-03T17:21:54.508Z" }]
+     */
+    public function finalizeTransfer( $data = null)
+    {        
+        if ( $data == null ) {
+            $data = [
+                "transfer_code" => request()->transfer_code,             
+                "otp" => request()->otp,                                       
+            ];        
+            array_filter($data);
+        }
+        return $this->setHttpResponse('/transaction/initialize', 'POST', $data)->getResponse();        
+    }
+   
+    /**
+     
+     * Initiate a bulk transfer request to Paystack
+     * @author Jacob Oluwafemi
+     * @return array ["status": true,  "message": "2 transfers queued."]
+     */
+    public function initiateBulkTransfer( $data = null)
+    {        
+        if ( $data == null ) {
+            $data = [
+                "currency" => request()->currency,
+                "source" => request()->source,             
+                "reason" => request()->reason,
+                "amount" => intval(request()->amount),
+                "transfers"=> request()->transfers,
+            ];        
+            array_filter($data);
+        }
+
+       return $this->setHttpResponse('/transfer/bulk', 'POST', $data)->getResponse();        
+    }
+
+    /**
+     * Fetch a paystack account balance     
+     * @return string
+     */
+    public function checkBalance()
+    {
+        $this->setRequestOptions();
+        return $this->setHttpResponse('/balance', 'GET')->getResponse();
+    }
+
+    /**
+     * Resend OTP for Transfer
+     * Generates a new OTP and sends to customer in the event they are having trouble receiving one.
+     * @author Jacob Oluwafemi
+     * @param $transfer_code
+     * @return array 
+     */
+    public function resendTransferOTP($transfer_code)
+    {
+        $data = [
+            "transfer_code" => request()->transfer_code,                                    
+        ];
+
+        $this->setRequestOptions();
+        return $this->setHttpResponse('/transfer/resend_otp', 'POST', $data)->getResponse();
+    }
+
+    /**
+     * Disable OTP requirement for Transfers
+     * In the event that you want to be able to complete transfers programmatically without use of OTPs, this endpoint helps disable that….with an OTP. No arguments required. You will get an OTP.
+     * @author Jacob Oluwafemi     
+     * @return array 
+     */
+    public function initiateTransferOTPDisable()
+    {
+        $data = [];
+        $this->setRequestOptions();
+        return $this->setHttpResponse('/transfer/disable_otp ', 'POST', $data)->getResponse();
+    }
+
+    /**
+     * Disable OTP requirement for Transfers
+     * In the event that you want to be able to complete transfers programmatically without use of OTPs, this endpoint helps disable that….with an OTP. No arguments required. You will get an OTP.
+     * @author Jacob Oluwafemi
+     * @param $otp
+     * @return array 
+     */
+    public function finalizeTransferOTPDisable()
+    {
+        $data = [
+            "otp" => request()->otp
+        ];
+        $this->setRequestOptions();
+        return $this->setHttpResponse('/transfer/disable_otp_finalize ', 'POST', $data)->getResponse();
+    }
+
+    /**
+     * Enable OTP requirement for Transfers
+     * In the event that a customer wants to stop being able to complete transfers programmatically, this endpoint helps turn OTP requirement back on. No arguments required.
+     * @author Jacob Oluwafemi     
+     * @return array 
+     */
+    public function enableTransferOTP()
+    {
+        $data = [];
+        $this->setRequestOptions();
+        return $this->setHttpResponse('/transfer/enable_otp ', 'POST', $data)->getResponse();
     }
 }
