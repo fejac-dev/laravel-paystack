@@ -100,11 +100,11 @@ class Paystack
         );
     }
 
-   
+
      /**
-     
+
      * Initiate a payment request to Paystack
-     * Included the option to pass the payload to this method for situations 
+     * Included the option to pass the payload to this method for situations
      * when the payload is built on the fly (not passed to the controller from a view)
      * @return Paystack
      */
@@ -130,7 +130,7 @@ class Paystack
                 *                                                            .
                 *                                                            .
                 *                                                        ]
-                *                                        
+                *
                 *                                  ]
                 */
                 'metadata' => request()->metadata
@@ -179,10 +179,10 @@ class Paystack
 
         return $this;
     }
-    
+
      /**
      * Get the authorization callback response
-     * In situations where Laravel serves as an backend for a detached UI, the api cannot redirect 
+     * In situations where Laravel serves as an backend for a detached UI, the api cannot redirect
      * and might need to take different actions based on the success or not of the transaction
      * @return array
      */
@@ -590,13 +590,13 @@ class Paystack
 
      /**
      * Creates a subaccount to be used for split payments . Required    params are business_name , settlement_bank , account_number ,   percentage_charge
-     * 
+     *
      * @return array
      */
-    
+
     public function createSubAccount(){
         $data = [
-            "business_name" => request()->business_name, 
+            "business_name" => request()->business_name,
             "settlement_bank" => request()->settlement_bank,
             "account_number" => request()->account_number,
             "percentage_charge" => request()->percentage_charge,
@@ -639,13 +639,13 @@ class Paystack
 
     /**
      * Updates a subaccount to be used for split payments . Required params are business_name , settlement_bank , account_number , percentage_charge
-     * @param subaccount code 
+     * @param subaccount code
      * @return array
      */
-    
+
     public function updateSubAccount($subaccount_code){
         $data = [
-            "business_name" => request()->business_name, 
+            "business_name" => request()->business_name,
             "settlement_bank" => request()->settlement_bank,
             "account_number" => request()->account_number,
             "percentage_charge" => request()->percentage_charge,
@@ -660,12 +660,12 @@ class Paystack
         $this->setRequestOptions();
         return $this->setHttpResponse("/subaccount/{$subaccount_code}", "PUT", array_filter($data))->getResponse();
 
-    }    
+    }
 
     /**
      * Create a transfer recipient.
      * @author Jacob Oluwafemi
-     * @param 
+     * @param
      * @return array
      */
     public function createTransferRecipient(){
@@ -680,7 +680,7 @@ class Paystack
         ];
 
         $this->setRequestOptions();
-        return $this->setHttpResponse("/transferrecipient", "PUT", array_filter($data))->getResponse();
+        return $this->setHttpResponse("/transferrecipient", "POST", array_filter($data))->getResponse();
     }
 
     /**
@@ -689,9 +689,14 @@ class Paystack
      * @param $per_page - Specifies how many records to retrieve per page , $page - Specifies exactly what page to retrieve
      * @return array
      */
-    public function listTransferRecipient($per_page,$page){
+    public function listTransferRecipient($per_page = null,$page = null){
         $this->setRequestOptions();
-        return $this->setHttpResponse("/transferrecipient/?perPage=".(int) $per_page."&page=".(int) $page,"GET")->getResponse();
+        if (isset($per_page) && isset($page)){
+            return $this->setHttpResponse("/transferrecipient/?perPage=".(int) $per_page."&page=".(int) $page,"GET")->getResponse();
+        }else{
+            return $this->setHttpResponse("/transferrecipient","GET")->getResponse();
+        }
+
     }
 
     /**
@@ -703,8 +708,8 @@ class Paystack
     public function updateTransferRecipient($recipient_code_or_id)
     {
         $data = [
-            "email" => request()->email,            
-            "name" => request()->name,                
+            "email" => request()->email,
+            "name" => request()->name,
         ];
 
         $this->setRequestOptions();
@@ -715,13 +720,13 @@ class Paystack
      * Delete an existing transfer recipient.
      * @author Jacob Oluwafemi
      * @param $recipient_code_or_id
-     * @return array 
+     * @return array
      */
     public function deleteTransferRecipient($recipient_code_or_id)
     {
         $data = [
-            "email" => request()->email,            
-            "name" => request()->name,                
+            "email" => request()->email,
+            "name" => request()->name,
         ];
 
         $this->setRequestOptions();
@@ -741,27 +746,27 @@ class Paystack
 
 
     /**
-     
+
      * Initiate a transfer request to Paystack
      * @author Jacob Oluwafemi
      * @return array ["status": true,  "message": "Transfer requires OTP to continue",  "data": { "integration": 100073, "domain": "test", "amount": 3794800, "currency": "NGN", "source": "balance","reason": "Calm down", "recipient": 28, "status": "otp", "transfer_code": "TRF_1ptvuv321ahaa7q", "id": 14, "createdAt": "2017-02-03T17:21:54.508Z", "updatedAt": "2017-02-03T17:21:54.508Z" }]
      */
     public function initiateTransfer( $data = null)
-    {        
+    {
         if ( $data == null ) {
             $data = [
-                "source" => request()->source,             
+                "source" => request()->source,
                 "reason" => request()->reason,
                 "amount" => intval(request()->amount),
                 "currency" => request()->currency,
-                "recipient" => request()->recipient,    
-                "reference" => request()->reference,   
-                         
-            ];        
+                "recipient" => request()->recipient,
+                "reference" => request()->reference,
+
+            ];
             array_filter($data);
         }
 
-       return $this->setHttpResponse('/transfer/initialize', 'POST', $data)->getResponse();        
+       return $this->setHttpResponse('/transfer', 'POST', $data)->getResponse();
     }
 
     /**
@@ -770,9 +775,13 @@ class Paystack
      * @param $per_page - Specifies how many records to retrieve per page , $page - Specifies exactly what page to retrieve
      * @return array
      */
-    public function listTransfers($per_page,$page){
+    public function listTransfers($per_page = null,$page = null){
         $this->setRequestOptions();
-        return $this->setHttpResponse("/transfer/?perPage=".(int) $per_page."&page=".(int) $page,"GET")->getResponse();
+        if (isset($per_page) && isset($page)){
+            return $this->setHttpResponse("/transfer/?perPage=".(int) $per_page."&page=".(int) $page,"GET")->getResponse();
+        }else{
+            return $this->setHttpResponse("/transfer","GET")->getResponse();
+        }
     }
 
     /**
@@ -785,49 +794,49 @@ class Paystack
         $this->setRequestOptions();
         return $this->setHttpResponse('/transfer/'. $id_or_code, 'GET', [])->getResponse();
     }
-    
+
     /**
-     
+
      * Finalize a transfer request to Paystack
      * @author Jacob Oluwafemi
      * @return array ["status": true,  "message": "Transfer requires OTP to continue",  "data": { "integration": 100073, "domain": "test", "amount": 3794800, "currency": "NGN", "source": "balance","reason": "Calm down", "recipient": 28, "status": "otp", "transfer_code": "TRF_1ptvuv321ahaa7q", "id": 14, "createdAt": "2017-02-03T17:21:54.508Z", "updatedAt": "2017-02-03T17:21:54.508Z" }]
      */
     public function finalizeTransfer( $data = null)
-    {        
+    {
         if ( $data == null ) {
             $data = [
-                "transfer_code" => request()->transfer_code,             
-                "otp" => request()->otp,                                       
-            ];        
+                "transfer_code" => request()->transfer_code,
+                "otp" => request()->otp,
+            ];
             array_filter($data);
         }
-        return $this->setHttpResponse('/transaction/initialize', 'POST', $data)->getResponse();        
+        return $this->setHttpResponse('/transfer/finalize_transfer', 'POST', $data)->getResponse();
     }
-   
+
     /**
-     
+
      * Initiate a bulk transfer request to Paystack
      * @author Jacob Oluwafemi
      * @return array ["status": true,  "message": "2 transfers queued."]
      */
     public function initiateBulkTransfer( $data = null)
-    {        
+    {
         if ( $data == null ) {
             $data = [
                 "currency" => request()->currency,
-                "source" => request()->source,             
+                "source" => request()->source,
                 "reason" => request()->reason,
                 "amount" => intval(request()->amount),
                 "transfers"=> request()->transfers,
-            ];        
+            ];
             array_filter($data);
         }
 
-       return $this->setHttpResponse('/transfer/bulk', 'POST', $data)->getResponse();        
+       return $this->setHttpResponse('/transfer/bulk', 'POST', $data)->getResponse();
     }
 
     /**
-     * Fetch a paystack account balance     
+     * Fetch a paystack account balance
      * @return string
      */
     public function checkBalance()
@@ -841,12 +850,12 @@ class Paystack
      * Generates a new OTP and sends to customer in the event they are having trouble receiving one.
      * @author Jacob Oluwafemi
      * @param $transfer_code
-     * @return array 
+     * @return array
      */
-    public function resendTransferOTP($transfer_code)
+    public function resendTransferOTP()
     {
         $data = [
-            "transfer_code" => request()->transfer_code,                                    
+            "transfer_code" => request()->transfer_code,
         ];
 
         $this->setRequestOptions();
@@ -856,8 +865,8 @@ class Paystack
     /**
      * Disable OTP requirement for Transfers
      * In the event that you want to be able to complete transfers programmatically without use of OTPs, this endpoint helps disable that….with an OTP. No arguments required. You will get an OTP.
-     * @author Jacob Oluwafemi     
-     * @return array 
+     * @author Jacob Oluwafemi
+     * @return array
      */
     public function initiateTransferOTPDisable()
     {
@@ -871,7 +880,7 @@ class Paystack
      * In the event that you want to be able to complete transfers programmatically without use of OTPs, this endpoint helps disable that….with an OTP. No arguments required. You will get an OTP.
      * @author Jacob Oluwafemi
      * @param $otp
-     * @return array 
+     * @return array
      */
     public function finalizeTransferOTPDisable()
     {
@@ -885,8 +894,8 @@ class Paystack
     /**
      * Enable OTP requirement for Transfers
      * In the event that a customer wants to stop being able to complete transfers programmatically, this endpoint helps turn OTP requirement back on. No arguments required.
-     * @author Jacob Oluwafemi     
-     * @return array 
+     * @author Jacob Oluwafemi
+     * @return array
      */
     public function enableTransferOTP()
     {
@@ -894,12 +903,12 @@ class Paystack
         $this->setRequestOptions();
         return $this->setHttpResponse('/transfer/enable_otp', 'POST', $data)->getResponse();
     }
-    
+
     /**
      * List of Banks
-     * 
-     * @author Jacob Oluwafemi     
-     * @return array 
+     *
+     * @author Jacob Oluwafemi
+     * @return array
      */
     public function listBank()
     {
@@ -909,9 +918,9 @@ class Paystack
     }
     /**
      * Resolve Account Number
-     * 
-     * @author Jacob Oluwafemi     
-     * @return array 
+     *
+     * @author Jacob Oluwafemi
+     * @return array
      */
     public function resolveAccountNumber()
     {
